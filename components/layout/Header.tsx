@@ -3,7 +3,11 @@
 import Link from "next/link";
 import { useState } from "react";
 
-export default function Header() {
+interface HeaderProps {
+  isLoggedIn?: boolean;
+}
+
+export default function Header({ isLoggedIn }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   return (
@@ -27,15 +31,26 @@ export default function Header() {
           <Link href="/register" className="text-text-secondary hover:text-purple-dark transition-colors">
             Artists
           </Link>
-          <Link href="/login" className="text-text-secondary hover:text-purple-dark transition-colors">
-            Sign In
-          </Link>
-          <Link
-            href="/join"
-            className="px-5 py-2 bg-purple-dark text-cream rounded-sm hover:bg-purple transition-colors text-sm tracking-wide"
-          >
-            Join
-          </Link>
+          {isLoggedIn ? (
+            <Link
+              href="/account"
+              className="px-5 py-2 bg-purple-dark text-cream rounded-sm hover:bg-purple transition-colors text-sm tracking-wide"
+            >
+              My Account
+            </Link>
+          ) : (
+            <>
+              <Link href="/login" className="text-text-secondary hover:text-purple-dark transition-colors">
+                Sign In
+              </Link>
+              <Link
+                href="/join"
+                className="px-5 py-2 bg-purple-dark text-cream rounded-sm hover:bg-purple transition-colors text-sm tracking-wide"
+              >
+                Join
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile hamburger */}
@@ -65,16 +80,28 @@ export default function Header() {
           <Link href="/register" className="text-text-secondary hover:text-purple-dark" onClick={() => setMenuOpen(false)}>
             Artists
           </Link>
-          <Link href="/login" className="text-text-secondary hover:text-purple-dark" onClick={() => setMenuOpen(false)}>
-            Sign In
-          </Link>
-          <Link
-            href="/join"
-            className="px-5 py-2 bg-purple-dark text-cream rounded-sm text-center text-sm tracking-wide"
-            onClick={() => setMenuOpen(false)}
-          >
-            Join
-          </Link>
+          {isLoggedIn ? (
+            <Link
+              href="/account"
+              className="px-5 py-2 bg-purple-dark text-cream rounded-sm text-center text-sm tracking-wide"
+              onClick={() => setMenuOpen(false)}
+            >
+              My Account
+            </Link>
+          ) : (
+            <>
+              <Link href="/login" className="text-text-secondary hover:text-purple-dark" onClick={() => setMenuOpen(false)}>
+                Sign In
+              </Link>
+              <Link
+                href="/join"
+                className="px-5 py-2 bg-purple-dark text-cream rounded-sm text-center text-sm tracking-wide"
+                onClick={() => setMenuOpen(false)}
+              >
+                Join
+              </Link>
+            </>
+          )}
         </div>
       )}
     </header>

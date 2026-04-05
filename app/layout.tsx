@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Playfair_Display, Lora } from "next/font/google";
+import { cookies } from "next/headers";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import "./globals.css";
@@ -22,15 +23,18 @@ export const metadata: Metadata = {
     "Art that reflects light, truth, and the beauty of God's creation. Selectively curated original works for the Christian home.",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const cookieStore = await cookies();
+  const isLoggedIn = !!cookieStore.get("ll-customer-token")?.value;
+
   return (
     <html lang="en" className={`${playfair.variable} ${lora.variable}`}>
       <body className="min-h-screen flex flex-col bg-cream text-text-primary font-body antialiased">
-        <Header />
+        <Header isLoggedIn={isLoggedIn} />
         <main className="flex-1">{children}</main>
         <Footer />
       </body>
