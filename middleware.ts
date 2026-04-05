@@ -24,7 +24,7 @@ export async function middleware(request: NextRequest) {
   // A03:2021 - Injection (CSP)
   response.headers.set(
     "Content-Security-Policy",
-    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://placehold.co https://*.placehold.co blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
+    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
   );
 
   // A09:2021 - Security Logging (request ID for tracing)
@@ -80,17 +80,7 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  if (isCustomerApi) {
-    const token = request.cookies.get("ll-customer-token")?.value;
-    if (!token) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-    try {
-      await jwtVerify(token, getSecret());
-    } catch {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-  }
+  // Tracking APIs pass through — they check auth internally and silently skip for anonymous users
 
   return response;
 }

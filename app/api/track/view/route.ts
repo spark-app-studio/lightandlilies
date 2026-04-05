@@ -6,7 +6,7 @@ let dbInit = false;
 
 export async function POST(request: Request) {
   const session = await verifyCustomerSession();
-  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  if (!session) return NextResponse.json({ success: true });
 
   if (!dbInit) { await initDb(); dbInit = true; }
 
