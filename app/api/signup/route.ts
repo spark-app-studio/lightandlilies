@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     const { email } = emailSignupSchema.parse(body);
 
     await resend.emails.send({
-      from: "Light & Lilies <notifications@lightandlilies.com>",
+      from: "Light & Lilies <curator@lightandlilies.com>",
       to: "Curator@lightandlilies.com",
       subject: "New Email Subscriber",
       html: `<p>New email signup: <strong>${email}</strong></p>`,

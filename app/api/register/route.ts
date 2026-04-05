@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     const data = artistRegistrationSchema.parse(body);
 
     await resend.emails.send({
-      from: "Light & Lilies <notifications@lightandlilies.com>",
+      from: "Light & Lilies <curator@lightandlilies.com>",
       to: "Curator@lightandlilies.com",
       subject: `New Artist Registration: ${data.fullName}`,
       html: `
