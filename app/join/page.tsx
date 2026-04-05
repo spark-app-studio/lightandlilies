@@ -69,7 +69,7 @@ export default function JoinPage() {
     });
 
     if (res.ok) {
-      router.push("/account");
+      window.location.href = "/account";
     } else {
       const data = await res.json();
       setError(data.error || "Something went wrong. Please try again.");
