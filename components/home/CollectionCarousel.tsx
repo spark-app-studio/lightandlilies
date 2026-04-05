@@ -57,9 +57,9 @@ export default function CollectionCarousel({ collection }: CollectionCarouselPro
               {collection.artworks.map((artwork) => (
                 <div
                   key={artwork.id}
-                  className="relative flex-[0_0_280px] md:flex-[0_0_320px] aspect-[4/3] rounded-sm group cursor-pointer"
+                  className="relative flex-[0_0_280px] md:flex-[0_0_320px] aspect-[4/3] rounded-xl group cursor-pointer"
                 >
-                  <div className="relative w-full h-full rounded-sm overflow-hidden transition-all duration-300 group-hover:scale-110 group-hover:shadow-2xl group-hover:z-20">
+                  <div className="relative w-full h-full rounded-xl overflow-hidden transition-all duration-300 group-hover:scale-110 group-hover:shadow-2xl group-hover:z-20">
                     <Image
                       src={artwork.imagePath}
                       alt={artwork.title}
