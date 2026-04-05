@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
 import { SignJWT } from "jose";
-import { Resend } from "resend";
+import { getResend } from "@/lib/resend";
 import { findAdminByEmail } from "@/lib/admins";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 function getSecret(): Uint8Array {
   return new TextEncoder().encode(process.env.ADMIN_SECRET);
@@ -39,7 +37,7 @@ export async function POST(request: Request) {
   const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || "http://localhost:3000";
   const resetUrl = `${baseUrl}/admin/reset-password?token=${resetToken}`;
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: "Light & Lilies <curator@lightandlilies.com>",
     to: admin.recoveryEmail,
     subject: "Password Reset — Light & Lilies Admin",

@@ -1,9 +1,7 @@
 import { NextResponse } from "next/server";
-import { Resend } from "resend";
+import { getResend } from "@/lib/resend";
 import { artistRegistrationSchema } from "@/lib/validation";
 import pool, { initDb } from "@/lib/db";
-
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 let dbInitialized = false;
 
@@ -48,7 +46,7 @@ export async function POST(request: Request) {
     );
 
     // Send notification to curator
-    await resend.emails.send({
+    await getResend().emails.send({
       from: "Light & Lilies <curator@lightandlilies.com>",
       to: "Curator@lightandlilies.com",
       subject: `New Artist Registration: ${data.fullName}`,
@@ -69,7 +67,7 @@ export async function POST(request: Request) {
     });
 
     // Send confirmation to the artist
-    await resend.emails.send({
+    await getResend().emails.send({
       from: "Light & Lilies <curator@lightandlilies.com>",
       to: data.email,
       subject: "Registration Received — Light & Lilies",
