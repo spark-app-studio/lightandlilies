@@ -1,31 +1,57 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 
-export default function AdminLoginPage() {
+export default function ResetPasswordForm() {
   const router = useRouter();
-  const [email, setEmail] = useState("");
+  const searchParams = useSearchParams();
+  const token = searchParams.get("token");
+
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  if (!token) {
+    return (
+      <div className="min-h-screen bg-cream flex items-center justify-center px-6">
+        <div className="text-center">
+          <p className="text-text-secondary mb-4">Invalid or missing reset token.</p>
+          <Link href="/admin/forgot-password" className="text-purple hover:text-purple-dark underline">
+            Request a new reset link
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    setLoading(true);
 
-    const res = await fetch("/api/admin/login", {
+    if (password.length < 8) {
+      setError("Password must be at least 8 characters");
+      return;
+    }
+    if (password !== confirm) {
+      setError("Passwords do not match");
+      return;
+    }
+
+    setLoading(true);
+    const res = await fetch("/api/admin/reset-password", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ token, password }),
     });
 
     if (res.ok) {
-      router.push("/admin");
+      router.push("/admin/login");
     } else {
       const data = await res.json();
-      setError(data.error || "Invalid credentials");
+      setError(data.error || "Failed to reset password");
       setLoading(false);
     }
   }
@@ -34,22 +60,23 @@ export default function AdminLoginPage() {
     <div className="min-h-screen bg-cream flex items-center justify-center px-6">
       <div className="w-full max-w-sm">
         <h1 className="font-heading text-3xl text-purple-dark text-center tracking-wide mb-8">
-          Admin Login
+          New Password
         </h1>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email"
-            required
-            className="w-full px-4 py-3 border border-purple-light rounded-sm bg-white text-text-primary focus:outline-none focus:ring-2 focus:ring-green-light"
-          />
           <input
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            placeholder="Password"
+            placeholder="New password (min 8 characters)"
+            required
+            minLength={8}
+            className="w-full px-4 py-3 border border-purple-light rounded-sm bg-white text-text-primary focus:outline-none focus:ring-2 focus:ring-green-light"
+          />
+          <input
+            type="password"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            placeholder="Confirm new password"
             required
             className="w-full px-4 py-3 border border-purple-light rounded-sm bg-white text-text-primary focus:outline-none focus:ring-2 focus:ring-green-light"
           />
@@ -59,13 +86,8 @@ export default function AdminLoginPage() {
             disabled={loading}
             className="w-full px-4 py-3 bg-purple-dark text-cream rounded-sm hover:bg-purple transition-colors tracking-wide disabled:opacity-50"
           >
-            {loading ? "Signing in..." : "Sign In"}
+            {loading ? "Resetting..." : "Reset Password"}
           </button>
-          <p className="text-center text-sm text-text-secondary">
-            <a href="/admin/forgot-password" className="hover:text-purple-dark transition-colors underline underline-offset-2">
-              Forgot password?
-            </a>
-          </p>
         </form>
       </div>
     </div>

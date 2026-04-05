@@ -20,3 +20,14 @@ export type ArtistRegistrationData = z.infer<typeof artistRegistrationSchema>;
 export const emailSignupSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
 });
+
+export const artworkSchema = z.object({
+  collectionId: z.string().min(1, "Collection is required"),
+  title: z.string().min(1, "Title is required").max(200),
+  medium: z.string().max(200).optional().default(""),
+  description: z.string().max(2000).optional().default(""),
+  imagePath: z.string().min(1, "Image URL is required").max(2000),
+  buyUrl: z.string().max(2000).optional().default(""),
+});
+
+export const artworkUpdateSchema = artworkSchema.partial();

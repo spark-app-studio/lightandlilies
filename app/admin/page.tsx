@@ -11,7 +11,7 @@ export default async function AdminPage() {
     redirect("/admin/login");
   }
 
-  const artworks = getAllArtworks();
+  const artworks = await getAllArtworks();
 
   return <AdminDashboard artworks={artworks} collections={collectionDefs} />;
 }

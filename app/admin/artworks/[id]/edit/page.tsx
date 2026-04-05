@@ -16,7 +16,7 @@ export default async function EditArtworkPage({
   }
 
   const { id } = await params;
-  const artwork = getArtworkById(id);
+  const artwork = await getArtworkById(id);
   if (!artwork) {
     notFound();
   }

@@ -3,26 +3,28 @@ import { getArtworksByCollection } from "@/lib/artworks";
 import type { Collection } from "@/lib/collections";
 import CollectionCarousel from "./CollectionCarousel";
 
-export default function Collections() {
-  const collections: Collection[] = collectionDefs.map((def) => {
-    const adminArtworks = getArtworksByCollection(def.id);
+export default async function Collections() {
+  const collections: Collection[] = await Promise.all(
+    collectionDefs.map(async (def) => {
+      const adminArtworks = await getArtworksByCollection(def.id);
 
-    if (adminArtworks.length > 0) {
-      return {
-        ...def,
-        artworks: adminArtworks.map((a) => ({
-          id: a.id,
-          title: a.title,
-          medium: a.medium,
-          description: a.description,
-          imagePath: a.imagePath,
-          buyUrl: a.buyUrl,
-        })),
-      };
-    }
+      if (adminArtworks.length > 0) {
+        return {
+          ...def,
+          artworks: adminArtworks.map((a) => ({
+            id: a.id,
+            title: a.title,
+            medium: a.medium,
+            description: a.description,
+            imagePath: a.imagePath,
+            buyUrl: a.buyUrl,
+          })),
+        };
+      }
 
-    return def;
-  });
+      return def;
+    })
+  );
 
   return (
     <section className="pt-10 pb-24 px-6">

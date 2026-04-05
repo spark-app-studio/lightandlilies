@@ -1,28 +1,28 @@
 import { NextResponse } from "next/server";
-import { verifySession } from "@/lib/auth";
 import { getAllArtworks, createArtwork } from "@/lib/artworks";
+import { artworkSchema } from "@/lib/validation";
 
 export async function GET() {
-  if (!(await verifySession())) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-  return NextResponse.json(getAllArtworks());
+  const artworks = await getAllArtworks();
+  return NextResponse.json(artworks);
 }
 
 export async function POST(request: Request) {
-  if (!(await verifySession())) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ error: "Invalid JSON" }, { status: 400 });
   }
 
-  const body = await request.json();
-  const artwork = createArtwork({
-    collectionId: body.collectionId,
-    title: body.title,
-    medium: body.medium || "",
-    description: body.description || "",
-    imagePath: body.imagePath || "",
-    buyUrl: body.buyUrl || "",
-  });
+  const result = artworkSchema.safeParse(body);
+  if (!result.success) {
+    return NextResponse.json(
+      { error: "Validation failed", details: result.error.issues },
+      { status: 400 }
+    );
+  }
 
+  const artwork = await createArtwork(result.data);
   return NextResponse.json(artwork, { status: 201 });
 }
