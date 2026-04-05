@@ -32,12 +32,17 @@ export default function Header({ isLoggedIn }: HeaderProps) {
             Artists
           </Link>
           {isLoggedIn ? (
-            <Link
-              href="/account"
-              className="px-5 py-2 bg-purple-dark text-cream rounded-sm hover:bg-purple transition-colors text-sm tracking-wide"
-            >
-              My Account
-            </Link>
+            <>
+              <Link href="/account" className="text-text-secondary hover:text-purple-dark transition-colors">
+                My Account
+              </Link>
+              <button
+                onClick={() => { fetch("/api/auth/logout", { method: "POST" }).then(() => { window.location.href = "/"; }); }}
+                className="px-5 py-2 border border-purple-light text-text-secondary rounded-sm hover:bg-purple-light/20 transition-colors text-sm tracking-wide"
+              >
+                Sign Out
+              </button>
+            </>
           ) : (
             <>
               <Link href="/login" className="text-text-secondary hover:text-purple-dark transition-colors">
@@ -81,13 +86,17 @@ export default function Header({ isLoggedIn }: HeaderProps) {
             Artists
           </Link>
           {isLoggedIn ? (
-            <Link
-              href="/account"
-              className="px-5 py-2 bg-purple-dark text-cream rounded-sm text-center text-sm tracking-wide"
-              onClick={() => setMenuOpen(false)}
-            >
-              My Account
-            </Link>
+            <>
+              <Link href="/account" className="text-text-secondary hover:text-purple-dark" onClick={() => setMenuOpen(false)}>
+                My Account
+              </Link>
+              <button
+                onClick={() => { setMenuOpen(false); fetch("/api/auth/logout", { method: "POST" }).then(() => { window.location.href = "/"; }); }}
+                className="px-5 py-2 border border-purple-light text-text-secondary rounded-sm text-center text-sm tracking-wide hover:bg-purple-light/20 transition-colors"
+              >
+                Sign Out
+              </button>
+            </>
           ) : (
             <>
               <Link href="/login" className="text-text-secondary hover:text-purple-dark" onClick={() => setMenuOpen(false)}>
