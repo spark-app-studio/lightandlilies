@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <rect width="32" height="32" rx="6" fill="#2D1B4E"/>
+  <g transform="translate(16,16)">
+    <!-- Lily petals -->
+    <ellipse cx="0" cy="-6" rx="3" ry="7" fill="#E8D5F5" opacity="0.9"/>
+    <ellipse cx="0" cy="-6" rx="3" ry="7" fill="#E8D5F5" opacity="0.9" transform="rotate(60)"/>
+    <ellipse cx="0" cy="-6" rx="3" ry="7" fill="#E8D5F5" opacity="0.9" transform="rotate(120)"/>
+    <ellipse cx="0" cy="-6" rx="3" ry="7" fill="#E8D5F5" opacity="0.9" transform="rotate(180)"/>
+    <ellipse cx="0" cy="-6" rx="3" ry="7" fill="#E8D5F5" opacity="0.9" transform="rotate(240)"/>
+    <ellipse cx="0" cy="-6" rx="3" ry="7" fill="#E8D5F5" opacity="0.9" transform="rotate(300)"/>
+    <!-- Center -->
+    <circle cx="0" cy="0" r="2.5" fill="#7BA67D"/>
+    <!-- Light ray accent -->
+    <circle cx="0" cy="0" r="1.2" fill="#D4E8D0"/>
+  </g>
+</svg>

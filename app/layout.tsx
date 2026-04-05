@@ -21,6 +21,9 @@ export const metadata: Metadata = {
   title: "Light & Lilies | Curated Art for the Christian Home",
   description:
     "Art that reflects light, truth, and the beauty of God's creation. Selectively curated original works for the Christian home.",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default async function RootLayout({
