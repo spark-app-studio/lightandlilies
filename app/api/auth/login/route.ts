@@ -1,21 +1,17 @@
 import { NextResponse } from "next/server";
 import { headers } from "next/headers";
-import { createSession } from "@/lib/auth";
-import { verifyAdminPassword } from "@/lib/admins";
+import { verifyCustomerPassword, createCustomerSession } from "@/lib/customer-auth";
 import { checkRateLimit } from "@/lib/rate-limit";
 
 export async function POST(request: Request) {
   const headersList = await headers();
   const ip = headersList.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
 
-  const { allowed, retryAfterSeconds } = checkRateLimit(ip);
+  const { allowed, retryAfterSeconds } = checkRateLimit(`customer:${ip}`);
   if (!allowed) {
     return NextResponse.json(
       { error: "Too many login attempts. Try again later." },
-      {
-        status: 429,
-        headers: { "Retry-After": String(retryAfterSeconds) },
-      }
+      { status: 429, headers: { "Retry-After": String(retryAfterSeconds) } }
     );
   }
 
@@ -31,13 +27,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Email and password required" }, { status: 400 });
   }
 
-  const admin = await verifyAdminPassword(email, password);
-
-  if (!admin) {
+  const customer = await verifyCustomerPassword(email, password);
+  if (!customer) {
     await new Promise((r) => setTimeout(r, 500));
     return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
   }
 
-  await createSession(admin.id, admin.email);
+  await createCustomerSession(customer.id, customer.email);
   return NextResponse.json({ success: true });
 }

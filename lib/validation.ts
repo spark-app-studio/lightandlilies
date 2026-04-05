@@ -21,6 +21,18 @@ export const emailSignupSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
 });
 
+export const customerRegistrationSchema = z.object({
+  fullName: z.string().min(1, "Full name is required"),
+  email: z.string().email("Please enter a valid email address"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  collections: z.array(z.string()).min(1, "Please select at least one collection"),
+  agreeToEmails: z.literal(true, {
+    message: "You must agree to receive email updates",
+  }),
+});
+
+export type CustomerRegistrationData = z.infer<typeof customerRegistrationSchema>;
+
 export const artworkSchema = z.object({
   collectionId: z.string().min(1, "Collection is required"),
   title: z.string().min(1, "Title is required").max(200),

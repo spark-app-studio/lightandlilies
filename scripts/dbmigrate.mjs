@@ -1,17 +1,37 @@
-import { Pool } from "pg";
+import { readFileSync } from "fs";
+import { resolve } from "path";
+import pg from "pg";
 import bcrypt from "bcryptjs";
+
+// Load .env.local
+try {
+  const envPath = resolve(process.cwd(), ".env.local");
+  const envFile = readFileSync(envPath, "utf-8");
+  for (const line of envFile.split("\n")) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+    const eqIndex = trimmed.indexOf("=");
+    if (eqIndex === -1) continue;
+    const key = trimmed.slice(0, eqIndex);
+    const value = trimmed.slice(eqIndex + 1);
+    if (!process.env[key]) process.env[key] = value;
+  }
+} catch {
+  // .env.local not found, rely on environment variables
+}
+
+const { Pool } = pg;
 
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  max: 10,
   ssl: process.env.DATABASE_SSL === "true"
     ? { rejectUnauthorized: false }
     : undefined,
 });
 
-export default pool;
+async function migrate() {
+  console.log("Running migrations...");
 
-export async function initDb() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS artworks (
       id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -91,19 +111,31 @@ export async function initDb() {
     );
   `);
 
-  // Seed master admin if not exists
+  console.log("Tables created.");
+
+  // Seed master admin
   const { rows } = await pool.query("SELECT id FROM admins WHERE email = $1", [
     "curator@lightandlilies.com",
   ]);
 
   if (rows.length === 0) {
-    const defaultPassword = process.env.ADMIN_PASSWORD || "changeme";
-    const hash = await bcrypt.hash(defaultPassword, 12);
+    const password = process.env.ADMIN_PASSWORD || "changeme";
+    const hash = await bcrypt.hash(password, 12);
     await pool.query(
       `INSERT INTO admins (email, recovery_email, password_hash, role)
        VALUES ($1, $2, $3, $4)`,
       ["curator@lightandlilies.com", "staceymar@gmail.com", hash, "master"]
     );
     console.log("Seeded master admin: curator@lightandlilies.com");
+  } else {
+    console.log("Master admin already exists, skipping seed.");
   }
+
+  await pool.end();
+  console.log("Migration complete.");
 }
+
+migrate().catch((err) => {
+  console.error("Migration failed:", err);
+  process.exit(1);
+});

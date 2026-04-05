@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getAllArtworks, createArtwork } from "@/lib/artworks";
 import { artworkSchema } from "@/lib/validation";
+import { notifyCollectionSubscribers } from "@/lib/notifications";
 
 export async function GET() {
   const artworks = await getAllArtworks();
@@ -24,5 +25,11 @@ export async function POST(request: Request) {
   }
 
   const artwork = await createArtwork(result.data);
+
+  // Notify subscribers in the background (don't block the response)
+  notifyCollectionSubscribers(artwork).catch((err) =>
+    console.error("Failed to send subscriber notifications:", err)
+  );
+
   return NextResponse.json(artwork, { status: 201 });
 }

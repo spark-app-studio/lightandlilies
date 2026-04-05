@@ -14,21 +14,34 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const response = NextResponse.next();
 
-  // Security headers on all responses
+  // --- OWASP Security Headers ---
+  // A05:2021 - Security Misconfiguration
   response.headers.set("X-Content-Type-Options", "nosniff");
   response.headers.set("X-Frame-Options", "DENY");
-  response.headers.set("X-XSS-Protection", "1; mode=block");
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=(), payment=()");
+
+  // A03:2021 - Injection (CSP)
   response.headers.set(
-    "Permissions-Policy",
-    "camera=(), microphone=(), geolocation=()"
+    "Content-Security-Policy",
+    "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://placehold.co https://*.placehold.co blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self';"
   );
 
-  // Protect admin routes (except login page and login API)
-  if (
-    (pathname.startsWith("/admin") && pathname !== "/admin/login") ||
-    (pathname.startsWith("/api/admin") && !pathname.startsWith("/api/admin/login"))
-  ) {
+  // A09:2021 - Security Logging (request ID for tracing)
+  response.headers.set("X-Request-Id", crypto.randomUUID());
+
+  // Strict-Transport-Security (HTTPS only in production)
+  if (process.env.NODE_ENV === "production") {
+    response.headers.set("Strict-Transport-Security", "max-age=63072000; includeSubDomains; preload");
+  }
+
+  // --- A01:2021 - Broken Access Control ---
+
+  // Protect admin routes (except login page, forgot-password)
+  const isAdminPage = pathname.startsWith("/admin") && pathname !== "/admin/login" && pathname !== "/admin/forgot-password" && pathname !== "/admin/reset-password";
+  const isAdminApi = pathname.startsWith("/api/admin") && !pathname.startsWith("/api/admin/login") && !pathname.startsWith("/api/admin/forgot-password") && !pathname.startsWith("/api/admin/reset-password");
+
+  if (isAdminPage || isAdminApi) {
     const token = request.cookies.get("ll-admin-token")?.value;
 
     if (!token) {
@@ -41,7 +54,6 @@ export async function middleware(request: NextRequest) {
     try {
       await jwtVerify(token, getSecret());
     } catch {
-      // Invalid or expired token
       const res = pathname.startsWith("/api/")
         ? NextResponse.json({ error: "Unauthorized" }, { status: 401 })
         : NextResponse.redirect(new URL("/admin/login", request.url));
@@ -50,13 +62,41 @@ export async function middleware(request: NextRequest) {
     }
   }
 
+  // Protect customer routes
+  const isCustomerPage = pathname === "/account" || pathname.startsWith("/account/") || pathname === "/collections";
+  const isCustomerApi = pathname.startsWith("/api/track/");
+
+  if (isCustomerPage) {
+    const token = request.cookies.get("ll-customer-token")?.value;
+    if (!token) {
+      return NextResponse.redirect(new URL("/login", request.url));
+    }
+    try {
+      await jwtVerify(token, getSecret());
+    } catch {
+      const res = NextResponse.redirect(new URL("/login", request.url));
+      res.cookies.delete("ll-customer-token");
+      return res;
+    }
+  }
+
+  if (isCustomerApi) {
+    const token = request.cookies.get("ll-customer-token")?.value;
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    try {
+      await jwtVerify(token, getSecret());
+    } catch {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+  }
+
   return response;
 }
 
 export const config = {
   matcher: [
-    "/admin/:path*",
-    "/api/admin/:path*",
     "/((?!_next/static|_next/image|favicon.ico).*)",
   ],
 };

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getResend } from "@/lib/resend";
 import { emailSignupSchema } from "@/lib/validation";
+import { emailSubscriberNotify } from "@/lib/email-templates";
 
 export async function POST(request: Request) {
   try {
@@ -11,15 +12,12 @@ export async function POST(request: Request) {
       from: "Light & Lilies <curator@lightandlilies.com>",
       to: "Curator@lightandlilies.com",
       subject: "New Email Subscriber",
-      html: `<p>New email signup: <strong>${email}</strong></p>`,
+      html: emailSubscriberNotify(email),
     });
 
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Signup error:", error);
-    return NextResponse.json(
-      { success: false, error: "Failed to process signup" },
-      { status: 500 }
-    );
+    return NextResponse.json({ success: false, error: "Failed to process signup" }, { status: 500 });
   }
 }

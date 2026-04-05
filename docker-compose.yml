@@ -6,7 +6,7 @@ services:
       POSTGRES_USER: lilies
       POSTGRES_PASSWORD: lilies_dev
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
     healthcheck:
@@ -18,11 +18,11 @@ services:
   app:
     build: .
     ports:
-      - "3000:3000"
+      - "3010:3000"
     environment:
       DATABASE_URL: postgres://lilies:lilies_dev@db:5432/lilies
-      ADMIN_PASSWORD: changeme
-      ADMIN_SECRET: local-dev-secret-change-in-prod
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-changeme}
+      ADMIN_SECRET: ${ADMIN_SECRET:-local-dev-secret-change-in-prod}
       RESEND_API_KEY: ${RESEND_API_KEY:-re_placeholder}
     depends_on:
       db:

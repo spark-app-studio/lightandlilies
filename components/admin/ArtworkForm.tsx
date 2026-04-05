@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { collections } from "@/lib/collections";
+import { collectionDefs as collections } from "@/lib/collections";
 import type { StoredArtwork } from "@/lib/artworks";
 
 interface ArtworkFormProps {

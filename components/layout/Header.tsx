@@ -24,11 +24,17 @@ export default function Header() {
           <Link href="/contact" className="text-text-secondary hover:text-purple-dark transition-colors">
             Contact
           </Link>
+          <Link href="/register" className="text-text-secondary hover:text-purple-dark transition-colors">
+            Artists
+          </Link>
+          <Link href="/login" className="text-text-secondary hover:text-purple-dark transition-colors">
+            Sign In
+          </Link>
           <Link
-            href="/register"
+            href="/join"
             className="px-5 py-2 bg-purple-dark text-cream rounded-sm hover:bg-purple transition-colors text-sm tracking-wide"
           >
-            Register as Artist
+            Join
           </Link>
         </div>
 
@@ -56,12 +62,18 @@ export default function Header() {
           <Link href="/contact" className="text-text-secondary hover:text-purple-dark" onClick={() => setMenuOpen(false)}>
             Contact
           </Link>
+          <Link href="/register" className="text-text-secondary hover:text-purple-dark" onClick={() => setMenuOpen(false)}>
+            Artists
+          </Link>
+          <Link href="/login" className="text-text-secondary hover:text-purple-dark" onClick={() => setMenuOpen(false)}>
+            Sign In
+          </Link>
           <Link
-            href="/register"
+            href="/join"
             className="px-5 py-2 bg-purple-dark text-cream rounded-sm text-center text-sm tracking-wide"
             onClick={() => setMenuOpen(false)}
           >
-            Register as Artist
+            Join
           </Link>
         </div>
       )}
